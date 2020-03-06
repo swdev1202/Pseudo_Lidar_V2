@@ -59,6 +59,8 @@ parser.add_argument('--bval', type=int, default=4,
                     help='validation batch size')
 parser.add_argument('--workers', type=int, default=8,
                     help='number of dataset workers')
+parser.add_argument('--argo', action='store_true',
+                    help='it gives argo full size image option')
 # learning rate
 parser.add_argument('--lr', type=float, default=0.001,
                     help='learning rate')
@@ -110,8 +112,8 @@ def main():
         TrainImgLoader = None
         import dataloader.KITTI_submission_loader  as KITTI_submission_loader
         TestImgLoader = torch.utils.data.DataLoader(
-            KITTI_submission_loader.SubmiteDataset(args.datapath, args.data_list, args.dynamic_bs),
-            batch_size=args.bval, shuffle=False, num_workers=args.workers, drop_last=False, argo=True)
+            KITTI_submission_loader.SubmiteDataset(args.datapath, args.data_list, args.dynamic_bs, argo=args.argo),
+            batch_size=args.bval, shuffle=False, num_workers=args.workers, drop_last=False)
     elif args.dataset == 'kitti':
         train_data, val_data = KITTILoader3D.dataloader(args.datapath, args.split_train, args.split_val,
                                                         kitti2015=args.kitti2015)
