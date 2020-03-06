@@ -111,7 +111,7 @@ def main():
         import dataloader.KITTI_submission_loader  as KITTI_submission_loader
         TestImgLoader = torch.utils.data.DataLoader(
             KITTI_submission_loader.SubmiteDataset(args.datapath, args.data_list, args.dynamic_bs),
-            batch_size=args.bval, shuffle=False, num_workers=args.workers, drop_last=False)
+            batch_size=args.bval, shuffle=False, num_workers=args.workers, drop_last=False, argo=True)
     elif args.dataset == 'kitti':
         train_data, val_data = KITTILoader3D.dataloader(args.datapath, args.split_train, args.split_val,
                                                         kitti2015=args.kitti2015)
