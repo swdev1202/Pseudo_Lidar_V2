@@ -61,6 +61,8 @@ parser.add_argument('--workers', type=int, default=8,
                     help='number of dataset workers')
 parser.add_argument('--argo', action='store_true',
                     help='it gives argo full size image option')
+parser.add_argument('--scale', nargs='+', type=int,
+                    help='scale factor of (H,W)')
 # learning rate
 parser.add_argument('--lr', type=float, default=0.001,
                     help='learning rate')
