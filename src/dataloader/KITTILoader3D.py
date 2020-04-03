@@ -8,7 +8,7 @@ def is_image_file(filename):
     return any(filename.endswith(extension) for extension in IMG_EXTENSIONS)
 
 
-def dataloader(filepath, train_file, val_file, kitti2015=False):
+def dataloader(filepath, train_file, val_file, argo=False, kitti2015=False):
     left_fold = 'image_2/'
     right_fold = 'image_3/'
     if kitti2015:

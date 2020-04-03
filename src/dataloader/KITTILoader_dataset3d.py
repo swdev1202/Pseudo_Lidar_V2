@@ -53,10 +53,11 @@ def dynamic_baseline(calib_info):
     return baseline
 
 class myImageFloder(data.Dataset):
-    def __init__(self, data, training, kitti2015=False, dynamic_bs=False, loader=default_loader, dploader=disparity_loader):
+    def __init__(self, data, training, kitti2015=False, dynamic_bs=False, argo=False, loader=default_loader, dploader=disparity_loader):
         left, right, left_depth, left_calib = data
         self.left = left
         self.dynamic_bs = dynamic_bs
+        self.argo = argo
         self.right = right
         self.depth = left_depth
         self.calib = left_calib
@@ -79,7 +80,10 @@ class myImageFloder(data.Dataset):
         if self.dynamic_bs:
             calib = np.reshape(calib_info['P2'], [3, 4])[0, 0] * dynamic_baseline(calib_info)
         else:
-            calib = np.reshape(calib_info['P2'], [3, 4])[0, 0] * 0.54
+            if(self.argo):
+                calib = np.reshape(calib_info['P2'], [3, 4])[0, 0] * 0.2986
+            else:
+                calib = np.reshape(calib_info['P2'], [3, 4])[0, 0] * 0.54
 
         left_img = self.loader(left)
         right_img = self.loader(right)
@@ -104,19 +108,23 @@ class myImageFloder(data.Dataset):
             right_img = self.transform(right_img)
 
         else:
-            w, h = left_img.size
+            if(self.argo):
+                left_img = self.transform(left_img)
+                right_img = self.transform(right_img)
+            else:
+                w, h = left_img.size
 
-            # left_img = left_img.crop((w - 1232, h - 368, w, h))
-            # right_img = right_img.crop((w - 1232, h - 368, w, h))
-            left_img = left_img.crop((w - 1200, h - 352, w, h))
-            right_img = right_img.crop((w - 1200, h - 352, w, h))
-            w1, h1 = left_img.size
+                # left_img = left_img.crop((w - 1232, h - 368, w, h))
+                # right_img = right_img.crop((w - 1232, h - 368, w, h))
+                left_img = left_img.crop((w - 1200, h - 352, w, h))
+                right_img = right_img.crop((w - 1200, h - 352, w, h))
+                w1, h1 = left_img.size
 
-            # dataL1 = dataL[h - 368:h, w - 1232:w]
-            dataL = dataL[h - 352:h, w - 1200:w]
+                # dataL1 = dataL[h - 368:h, w - 1232:w]
+                dataL = dataL[h - 352:h, w - 1200:w]
 
-            left_img = self.transform(left_img)
-            right_img = self.transform(right_img)
+                left_img = self.transform(left_img)
+                right_img = self.transform(right_img)
 
         dataL = torch.from_numpy(dataL).float()
         return left_img.float(), right_img.float(), dataL.float(), calib.item()

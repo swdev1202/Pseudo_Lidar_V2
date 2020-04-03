@@ -40,10 +40,9 @@ def dynamic_baseline(calib_info):
     return baseline
 
 class SubmiteDataset(object):
-    def __init__(self, filepath, split, dynamic_bs=False, kitti2015=False, argo=False, scale_factor=[1,1]):
+    def __init__(self, filepath, split, argo=False, dynamic_bs=False, kitti2015=False):
         self.dynamic_bs = dynamic_bs
         self.argo = argo
-        self.scale_factor = scale_factor
 
         left_fold = 'image_2/'
         right_fold = 'image_3/'
@@ -75,37 +74,24 @@ class SubmiteDataset(object):
         calib_info = read_calib_file(self.calib_test[item])
         if self.dynamic_bs:
             calib = np.reshape(calib_info['P2'], [3, 4])[0, 0] * dynamic_baseline(calib_info)
-        elif self.argo:
-            calib = np.reshape(calib_info['P2'], [3, 4])[0, 0] * 0.2986
         else:
-            calib = np.reshape(calib_info['P2'], [3, 4])[0, 0] * 0.54
+            if(self.argo):
+                calib = np.reshape(calib_info['P2'], [3, 4])[0, 0] * 0.2986
+            else:
+                calib = np.reshape(calib_info['P2'], [3, 4])[0, 0] * 0.54
 
         imgL = Image.open(left_img).convert('RGB')
         imgR = Image.open(right_img).convert('RGB')
 
-        if(self.argo):
-            # resize the image
-            NEW_IMG_HEIGHT = 2056//self.scale_factor[0]
-            NEW_IMG_WIDTH = 2464//self.scale_factor[1]
-
-            imgL = transforms.Resize((NEW_IMG_HEIGHT,NEW_IMG_WIDTH),2)(imgL)
-            imgR = transforms.Resize((NEW_IMG_HEIGHT,NEW_IMG_WIDTH),2)(imgR)
-
         imgL = self.trans(imgL)[None, :, :, :]
         imgR = self.trans(imgR)[None, :, :, :]
-        # pad to (384, 1248)
+        
         B, C, H, W = imgL.shape
         
-        if(self.argo):
-            # calculate the padding amount
-            top_pad_const = NEW_IMG_HEIGHT + (32 - (NEW_IMG_HEIGHT%32))
-            left_pad_const = NEW_IMG_WIDTH + (32 - (NEW_IMG_WIDTH%32))
-            
-            top_pad = top_pad_const - H
-            right_pad = left_pad_const - W
-
-            H, W = NEW_IMG_HEIGHT, NEW_IMG_WIDTH
-        else:
+        if(self.argo): # pad to (544, 640)
+            top_pad = 544 - H
+            right_pad = 640 - W
+        else: # pad to (384, 1248)
             top_pad = 384 - H
             right_pad = 1248 - W
 
