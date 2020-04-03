@@ -4,7 +4,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import kitti_util
 import numpy as np
-import scipy.misc as ssc
+import imageio
 
 
 def generate_dispariy_from_velo(pc_velo, height, width, calib):
@@ -58,7 +58,7 @@ if __name__ == '__main__':
         # load point cloud
         lidar = np.fromfile(lidar_dir + '/' + fn, dtype=np.float32).reshape((-1, 4))[:, :3]
         image_file = '{}/{}.png'.format(image_dir, predix)
-        image = ssc.imread(image_file)
+        image = imageio.imread(image_file)
         height, width = image.shape[:2]
         depth_map = generate_dispariy_from_velo(lidar, height, width, calib)
         np.save(depth_dir + '/' + predix, depth_map)
