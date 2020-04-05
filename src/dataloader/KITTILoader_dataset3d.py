@@ -111,8 +111,8 @@ class myImageFloder(data.Dataset):
             if(self.argo):
                 w, h = left_img.size
 
-                left_img = left_img.crop((w-608, h-512), w, h)
-                right_img = right_img.crop((w-608, h-512), w, h)
+                left_img = left_img.crop((w-608, h-512, w, h))
+                right_img = right_img.crop((w-608, h-512, w, h))
                 dataL = dataL[h-512:h, w-512:w]
 
                 left_img = self.transform(left_img)
