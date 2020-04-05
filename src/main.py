@@ -123,7 +123,7 @@ def main():
             KITTILoader_dataset3d.myImageFloder(train_data, True, kitti2015=args.kitti2015, dynamic_bs=args.dynamic_bs, argo=args.argo),
             batch_size=args.btrain, shuffle=True, num_workers=args.workers, drop_last=False, pin_memory=True)
         TestImgLoader = torch.utils.data.DataLoader(
-            KITTILoader_dataset3d.myImageFloder(val_data, False, kitti2015=args.kitti2015, dynamic_bs=args.dynamic_bs),
+            KITTILoader_dataset3d.myImageFloder(val_data, False, kitti2015=args.kitti2015, dynamic_bs=args.dynamic_bs, argo=args.argo),
             batch_size=args.bval, shuffle=False, num_workers=args.workers, drop_last=False, pin_memory=True)
     else:
         train_data, val_data = listflowfile.dataloader(args.datapath)
