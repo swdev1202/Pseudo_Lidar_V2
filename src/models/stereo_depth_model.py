@@ -44,7 +44,8 @@ class hourglass(nn.Module):
         out = self.conv3(pre)  # in:1/8 out:1/16
         out = self.conv4(out)  # in:1/16 out:1/16
 
-        print(out.size())
+        print(f'out_size = {out.size()}')
+        print(f'pre_size = {pre.size()}')
 
         if presqu is not None:
             post = F.relu(self.conv5(out) + presqu, inplace=True)  # in:1/16 out:1/8
