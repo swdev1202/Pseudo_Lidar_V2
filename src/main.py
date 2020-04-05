@@ -297,6 +297,7 @@ def test(imgL, imgR, depth, calib, metric_log, model):
     mask.detach_()
     with torch.no_grad():
         output3 = model(imgL, imgR, calib)
+        print(f'output3 shape {output3.size()}')
         output3 = torch.squeeze(output3, 1)
 
         if args.data_type == 'disparity':
