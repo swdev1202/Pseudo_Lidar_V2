@@ -116,10 +116,8 @@ class myImageFloder(data.Dataset):
 
                 # left_img = left_img.crop((w - 1232, h - 368, w, h))
                 # right_img = right_img.crop((w - 1232, h - 368, w, h))
-                left_img = left_img.crop((w - 1200, h - 352, w, h))
+                left_img = left_img.crop((w - 1200, h - 352, w, h)) # crop(32,16,w,h)
                 right_img = right_img.crop((w - 1200, h - 352, w, h))
-                w1, h1 = left_img.size
-
                 # dataL1 = dataL[h - 368:h, w - 1232:w]
                 dataL = dataL[h - 352:h, w - 1200:w]
 
