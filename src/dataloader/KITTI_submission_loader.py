@@ -89,14 +89,15 @@ class SubmiteDataset(object):
         B, C, H, W = imgL.shape
         
         if(self.argo): # pad to (544, 640)
-            top_pad = 544 - H
-            right_pad = 640 - W
+            top_pad = 540 - H # 544 - 514 = 30
+            right_pad = 640 - W # 640 - 616 = 24
         else: # pad to (384, 1248)
             top_pad = 384 - H
             right_pad = 1248 - W
 
         imgL = F.pad(imgL, (0, right_pad, top_pad, 0), "constant", 0)
         imgR = F.pad(imgR, (0, right_pad, top_pad, 0), "constant", 0)
+        print(f'imageL data size after padding = {imgL.data.size()}')
         filename = self.left_test[item].split('/')[-1][:-4]
 
         return imgL[0].float(), imgR[0].float(), calib.item(), H, W, filename
