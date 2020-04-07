@@ -111,6 +111,7 @@ def main():
 
     # Data Loader
     if args.generate_depth_map:
+        print('here')
         TrainImgLoader = None
         import dataloader.KITTI_submission_loader  as KITTI_submission_loader
         TestImgLoader = torch.utils.data.DataLoader(

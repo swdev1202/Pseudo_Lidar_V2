@@ -89,7 +89,7 @@ class SubmiteDataset(object):
         B, C, H, W = imgL.shape
         
         if(self.argo): # pad to (544, 640)
-            top_pad = 540 - H # 544 - 514 = 30
+            top_pad = 544 - H # 544 - 514 = 30
             right_pad = 640 - W # 640 - 616 = 24
         else: # pad to (384, 1248)
             top_pad = 384 - H
