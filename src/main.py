@@ -111,7 +111,6 @@ def main():
 
     # Data Loader
     if args.generate_depth_map:
-        print('here')
         TrainImgLoader = None
         import dataloader.KITTI_submission_loader  as KITTI_submission_loader
         TestImgLoader = torch.utils.data.DataLoader(
@@ -180,12 +179,8 @@ def main():
 
         tqdm_eval_loader = tqdm(TestImgLoader, total=len(TestImgLoader))
         for batch_idx, (imgL_crop, imgR_crop, calib, H, W, filename) in enumerate(tqdm_eval_loader):
-            print(f'inside tqdm eval loader = {imgL_crop.data.size()}, {H}, {W}')
             pred_disp = inference(imgL_crop, imgR_crop, calib, model)
             for idx, name in enumerate(filename):
-                print(f'predicted disparity shape = {pred_disp[idx].shape}')
-                temp = pred_disp[idx][-H[idx]:, :W[idx]]
-                print(f'cropped disparity shape = {temp.shape}')
                 np.save(args.save_path + '/depth_maps/' + args.data_tag + '/' + name, pred_disp[idx][-H[idx]:, :W[idx]])
         import sys
         sys.exit()

@@ -97,7 +97,6 @@ class SubmiteDataset(object):
 
         imgL = F.pad(imgL, (0, right_pad, top_pad, 0), "constant", 0)
         imgR = F.pad(imgR, (0, right_pad, top_pad, 0), "constant", 0)
-        print(f'imageL data size after padding = {imgL.data.size()}')
         filename = self.left_test[item].split('/')[-1][:-4]
 
         return imgL[0].float(), imgR[0].float(), calib.item(), H, W, filename
