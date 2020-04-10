@@ -115,14 +115,10 @@ def GDC(pred_depth, gt_depth, calib,
 
     ptc = depth2ptc(pred_depth, calib)
     print(f'ptc shape = {ptc.shape}')
-    # consider_PL = (filter_mask(ptc) * filter_theta_mask(
-    #     ptc, low=np.radians(consider_range[0]),
-    #     high=np.radians(consider_range[1]))).reshape(pred_depth.shape)
     consider_PL = (filter_mask(ptc) * filter_theta_mask(
         ptc, low=np.radians(consider_range[0]),
-        high=np.radians(consider_range[1])))
+        high=np.radians(consider_range[1]))).reshape(pred_depth.shape)
 
-    print(consider_PL.shape)
     if subsample:
         subsample_mask = subsample_mask_by_grid(
             ptc).reshape(pred_depth.shape)
