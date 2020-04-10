@@ -45,7 +45,8 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1):
     :param slice: output every slice lines
     """
 
-    dtheta = np.radians(0.4 * 64.0 / H)
+    # dtheta = np.radians(0.4 * 64.0 / H)
+    dtheta = np.radians(1.25 * 64.0 / H)
     dphi = np.radians(90.0 / W)
 
     x, y, z, i = velo_points[:, 0], velo_points[:, 1], velo_points[:, 2], velo_points[:, 3]
