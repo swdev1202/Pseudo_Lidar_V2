@@ -81,7 +81,7 @@ def main(args):
             res.append((idx, pool.apply_async(
                 GDC_and_save, args=(GDC, save_path, predict, gt, calib),
                 kwds={'W_tol': 1e-5, 'recon_tol': args.recon_tol, 'k': args.k,
-                      'method': args.method, 'subsample': args.subsample, 'consider_range': args.consider_range, 'verbose' : True}, callback=update)))
+                      'method': args.method, 'subsample': args.subsample, 'consider_range': args.consider_range}, callback=update)))
 
         pool.close()
         pool.join()
