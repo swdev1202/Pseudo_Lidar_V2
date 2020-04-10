@@ -30,8 +30,6 @@ def filter_mask(pc_rect):
                  (pc_rect[:, 0] >= -40) * \
                  (pc_rect[:, 1] < 2.5) * \
                  (pc_rect[:, 1] >= -1)
-
-    print(f'filter_mask final shape = {valid_inds.shape}')
     return valid_inds
 
 
@@ -114,7 +112,6 @@ def GDC(pred_depth, gt_depth, calib,
         print("warpping up depth infos...")
 
     ptc = depth2ptc(pred_depth, calib)
-    print(f'ptc shape = {ptc.shape}')
     consider_PL = (filter_mask(ptc) * filter_theta_mask(
         ptc, low=np.radians(consider_range[0]),
         high=np.radians(consider_range[1]))).reshape(pred_depth.shape)
