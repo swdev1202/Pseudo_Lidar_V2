@@ -20,7 +20,7 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1, line_spec=None, argo=False,
     """
 
     if(argo):
-        dtheta = np.radians(1.25 * 32.0 / H)
+        dtheta = np.radians(1.25 * 64.0 / H)
     else:
         dtheta = np.radians(0.4 * 64.0 / H)
     
@@ -38,7 +38,7 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1, line_spec=None, argo=False,
     phi_[phi_ >= W] = W - 1
 
     if(argo):
-        theta = np.radians(15.) - np.arcsin(z / d)
+        theta = np.radians(30.) - np.arcsin(z / d)
     else:
         theta = np.radians(2.) - np.arcsin(z / d)
     theta_ = (theta / dtheta).astype(int)
