@@ -10,7 +10,7 @@ from data_utils.kitti_object import *
 from data_utils.kitti_util import rotz, Calibration, load_image, load_velo_scan
 from multiprocessing import Process, Queue, Pool
 
-def pto_ang_map(velo_points, H=64, W=512, slice=1, line_spec=None, vert_res=0.4, top_angle=2.,
+def pto_ang_map(velo_points, H=64, W=512, slice=1, line_spec=None, argo=False,
                 get_lines=False, fill_in_line=None, fill_in_spec=None,
                 fill_in_slice=None):
     """
@@ -19,7 +19,11 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1, line_spec=None, vert_res=0.4,
     :param slice: output every slice lines
     """
 
-    dtheta = np.radians(vert_res * 64.0 / H)
+    if(argo):
+        dtheta = np.radians(1.25 * 32.0 / H)
+    else:
+        dtheta = np.radians(0.4 * 64.0 / H)
+    
     dphi = np.radians(90.0 / W)
 
     x, y, z, i = velo_points[:, 0], velo_points[:,1], velo_points[:, 2], velo_points[:, 3]
@@ -33,7 +37,10 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1, line_spec=None, vert_res=0.4,
     phi_[phi_ < 0] = 0
     phi_[phi_ >= W] = W - 1
 
-    theta = np.radians(top_angle) - np.arcsin(z / d)
+    if(argo):
+        theta = np.radians(15.) - np.arcsin(z / d)
+    else:
+        theta = np.radians(2.) - np.arcsin(z / d)
     theta_ = (theta / dtheta).astype(int)
     theta_[theta_ < 0] = 0
     theta_[theta_ >= H] = H - 1
@@ -89,16 +96,16 @@ def gen_sparse_points(data_idx, args):
         fill_in_line = None
 
     if args.store_line_map_dir is not None:
-        depth_map_lines, ptc = pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice, vert_res=args.vert_res, top_angle=args.top_angle,\
-                    line_spec=args.line_spec, get_lines=True,\
+        depth_map_lines, ptc = pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice,\
+                    line_spec=args.line_spec, argo=args.argo, get_lines=True,\
                     fill_in_line=fill_in_line, fill_in_spec=args.fill_in_spec,
                     fill_in_slice=args.fill_in_slice)
         np.save(osp.join(args.store_line_map_dir,
                             "{:06d}".format(data_idx)), depth_map_lines)
         return ptc
     else:
-        return pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice, vert_res=args.vert_res, top_angle=args.top_angle,\
-                            line_spec=args.line_spec, get_lines=False,
+        return pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice,\
+                            line_spec=args.line_spec, argo=args.argo, get_lines=False,
                             fill_in_line=fill_in_line, fill_in_spec=args.fill_in_spec,
                             fill_in_slice=args.fill_in_slice)
 
@@ -157,8 +164,7 @@ if __name__ == '__main__':
     parser.add_argument('--fill_in_slice', type=int, default=None)
     parser.add_argument('--split_file', type=str)
     parser.add_argument('--threads', type=int, default=4)
-    parser.add_argument('--vert_res', default=0.4, type=float)
-    parser.add_argument('--top_angle', default=2.0, type=float)
+    parser.add_argument('--argo', action='store_true')
     args = parser.parse_args()
 
     gen_sparse_points_all(args)

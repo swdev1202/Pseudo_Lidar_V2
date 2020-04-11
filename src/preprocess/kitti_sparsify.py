@@ -38,14 +38,19 @@ def pto_rec_map(velo_points, H=64, W=512, D=800):
     return depth_map
 
 
-def pto_ang_map(velo_points, H=64, W=512, slice=1, vert_res=0.4, top_angle=2.):
+def pto_ang_map(velo_points, H=64, W=512, slice=1, argo=False):
     """
     :param H: the row num of depth map, could be 64(default), 32, 16
     :param W: the col num of depth map
     :param slice: output every slice lines
     """
 
-    dtheta = np.radians(vert_res * 64.0 / H)
+
+    if(argo):
+        dtheta = np.radians(1.25 * 32.0 / H)
+    else:
+        dtheta = np.radians(0.4 * 64.0 / H)
+
     dphi = np.radians(90.0 / W)
 
     x, y, z, i = velo_points[:, 0], velo_points[:, 1], velo_points[:, 2], velo_points[:, 3]
@@ -59,7 +64,10 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1, vert_res=0.4, top_angle=2.):
     phi_[phi_ < 0] = 0
     phi_[phi_ >= W] = W - 1
 
-    theta = np.radians(top_angle) - np.arcsin(z / d)
+    if(argo):
+        theta = np.radians(15.) - np.arcsin(z / d)
+    else:
+        theta = np.radians(2.) - np.arcsin(z / d)
     theta_ = (theta / dtheta).astype(int)
     theta_[theta_ < 0] = 0
     theta_[theta_ >= H] = H - 1
@@ -87,7 +95,7 @@ def gen_sparse_points(pl_data_path, args):
                  (pc_velo[:, 2] >= -2.5)
     pc_velo = pc_velo[valid_inds]
 
-    return pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice, vert_res=args.vert_res, top_angle=args.top_angle)
+    return pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice, argo=args.argo)
 
 
 def gen_sparse_points_all(args):
@@ -109,8 +117,7 @@ if __name__ == '__main__':
     parser.add_argument('--H', default=64, type=int)
     parser.add_argument('--W', default=512, type=int)
     parser.add_argument('--D', default=700, type=int)
-    parser.add_argument('--vert_res', default=0.4, type=float)
-    parser.add_argument('--top_angle', default=2.0, type=float)
+    parser.add_argument('--argo', action='store_true')
     args = parser.parse_args()
 
     gen_sparse_points_all(args)
