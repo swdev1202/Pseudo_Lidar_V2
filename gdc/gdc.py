@@ -53,6 +53,7 @@ def subsample_mask_by_grid(pc_velo):
 
     print(index_field.shape)
     print(np.arange(pc_velo.shape[0]))
+    print(pc_velo_quantized.shape)
     index_field[pc_velo_quantized[:, 2],
                 pc_velo_quantized[:, 0], pc_velo_quantized[:, 1]] = np.arange(pc_velo.shape[0])
     mask = np.zeros(perm.shape, dtype=np.bool)
