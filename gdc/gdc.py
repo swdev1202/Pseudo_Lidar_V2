@@ -51,6 +51,7 @@ def subsample_mask_by_grid(pc_velo):
 
     index_field = index_field_sample.copy()
 
+    print(index_field.shape)
     index_field[pc_velo_quantized[:, 2],
                 pc_velo_quantized[:, 0], pc_velo_quantized[:, 1]] = np.arange(pc_velo.shape[0])
     mask = np.zeros(perm.shape, dtype=np.bool)
@@ -107,6 +108,7 @@ def GDC(pred_depth, gt_depth, calib,
         print("warpping up depth infos...")
 
     ptc = depth2ptc(pred_depth, calib) # ptc in velo (in argo, it means ego-vehicle)
+    print(ptc.shape)
     consider_PL = (filter_mask(ptc) * filter_theta_mask(
         ptc, low=np.radians(consider_range[0]),
         high=np.radians(consider_range[1]))).reshape(pred_depth.shape)
