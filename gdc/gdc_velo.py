@@ -22,54 +22,49 @@ os.environ["MKL_NUM_THREADS"] = "2"
 os.environ["VECLIB_MAXIMUM_THREADS"] = "2"
 os.environ["NUMEXPR_NUM_THREADS"] = "2"
 
-def filter_mask(pc_rect):
+def filter_mask(pc_velo):
     """Return index of points that lies within the region defined below."""
-    valid_inds = (pc_rect[:, 2] < 80) * \
-                 (pc_rect[:, 2] > 1) * \
-                 (pc_rect[:, 0] < 40) * \
-                 (pc_rect[:, 0] >= -40) * \
-                 (pc_rect[:, 1] < 2.5) * \
-                 (pc_rect[:, 1] >= -1)
-    return valid_inds
-
+    valid_inds = (pc_velo[:, 0] < 80) * \
+                 (pc_velo[:, 0] > 1) * \
+                 (pc_velo[:, 1] < 40) * \
+                 (pc_velo[:, 1] >= -40) * \
+                 (pc_velo[:, 2] < 2.5) * \
+                 (pc_velo[:, 2] >= -1)
+    return valid_inds 
 
 GRID_SIZE = 0.1
 index_field_sample = np.full(
     (35, int(80 / 0.1), int(80 / 0.1)), -1, dtype=np.int32)
 
-def subsample_mask_by_grid(pc_rect):
-    N = pc_rect.shape[0]
-    perm = np.random.permutation(pc_rect.shape[0])
-    pc_rect = pc_rect[perm]
+def subsample_mask_by_grid(pc_velo):
+    N = pc_velo.shape[0]
+    perm = np.random.permutation(pc_velo.shape[0])
+    pc_velo = pc_velo[perm]
 
-    range_filter = filter_mask(pc_rect)
-    pc_rect = pc_rect[range_filter]
+    range_filter = filter_mask(pc_velo)
+    pc_velo = pc_velo[range_filter]
 
-    pc_rect_quantized = np.floor(pc_rect[:, :3] / GRID_SIZE).astype(np.int32)
-    pc_rect_quantized[:, 0] = pc_rect_quantized[:, 0] \
+    pc_velo_quantized = np.floor(pc_velo[:, :3] / GRID_SIZE).astype(np.int32)
+    pc_velo_quantized[:, 1] = pc_velo_quantized[:, 1] \
         + int(80 / GRID_SIZE / 2)
-    pc_rect_quantized[:, 1] = pc_rect_quantized[:, 1] + int(1 / GRID_SIZE)
+    pc_velo_quantized[:, 2] = pc_velo_quantized[:, 2] + int(1 / GRID_SIZE)
 
     index_field = index_field_sample.copy()
-    print(index_field.shape)
-    print(np.arange(pc_rect.shape[0]))
-    print(pc_rect_quantized.shape)
 
-    index_field[pc_rect_quantized[:, 1],
-                pc_rect_quantized[:, 2], pc_rect_quantized[:, 0]] = np.arange(pc_rect.shape[0])
+    print(index_field.shape)
+    print(np.arange(pc_velo.shape[0]))
+    print(pc_velo_quantized.shape)
+    index_field[pc_velo_quantized[:, 2],
+                pc_velo_quantized[:, 0], pc_velo_quantized[:, 1]] = np.arange(pc_velo.shape[0])
     mask = np.zeros(perm.shape, dtype=np.bool)
     mask[perm[range_filter][index_field[index_field >= 0]]] = 1
     return mask
 
 
-def filter_theta_mask(pc_rect, low, high):
-    # though if we have to do this precisely, we should convert
-    # point clouds to velodyne space, here we just use those in rect space,
-    # since actually the velodyne and the cameras are very close to each other.
-
-    x, y, z = pc_rect[:, 0], pc_rect[:, 1], pc_rect[:, 2]
+def filter_theta_mask(pc_velo, low, high):
+    x, y, z = pc_velo[:, 0], pc_velo[:, 1], pc_velo[:, 2]
     d = np.sqrt(x ** 2 + y ** 2 + z ** 2)
-    theta = np.arcsin(y / d)
+    theta = np.arcsin(z / d)
     return (theta >= low) * (theta < high)
 
 
@@ -78,7 +73,7 @@ def depth2ptc(depth, calib):
     rows, cols = depth.shape
     c, r = np.meshgrid(np.arange(cols), np.arange(rows))
     points = np.stack([c, r, depth]).reshape((3, -1)).T
-    return calib.project_image_to_rect(points)
+    return calib.project_image_to_velo(points)
 
 
 def GDC(pred_depth, gt_depth, calib,
@@ -114,7 +109,8 @@ def GDC(pred_depth, gt_depth, calib,
     if verbose:
         print("warpping up depth infos...")
 
-    ptc = depth2ptc(pred_depth, calib)
+    ptc = depth2ptc(pred_depth, calib) # ptc in velo (in argo, it means ego-vehicle)
+    print(ptc.shape)
     consider_PL = (filter_mask(ptc) * filter_theta_mask(
         ptc, low=np.radians(consider_range[0]),
         high=np.radians(consider_range[1]))).reshape(pred_depth.shape)
