@@ -25,7 +25,7 @@ os.environ["NUMEXPR_NUM_THREADS"] = "2"
 def filter_mask(pc_velo):
     """Return index of points that lies within the region defined below."""
     valid_inds = (pc_velo[:, 0] < 80) * \
-                 (pc_velo[:, 0] > 2) * \
+                 (pc_velo[:, 0] > 1) * \
                  (pc_velo[:, 1] < 40) * \
                  (pc_velo[:, 1] >= -40) * \
                  (pc_velo[:, 2] < 2.5) * \
