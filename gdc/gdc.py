@@ -22,7 +22,7 @@ os.environ["MKL_NUM_THREADS"] = "2"
 os.environ["VECLIB_MAXIMUM_THREADS"] = "2"
 os.environ["NUMEXPR_NUM_THREADS"] = "2"
 
-=def filter_mask(pc_rect):
+def filter_mask(pc_rect):
     """Return index of points that lies within the region defined below."""
     valid_inds = (pc_rect[:, 2] < 80) * \
                  (pc_rect[:, 2] > 1) * \
