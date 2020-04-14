@@ -44,8 +44,6 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1, argo=False):
     :param W: the col num of depth map
     :param slice: output every slice lines
     """
-
-
     if(argo):
         dtheta = np.radians(0.625 * 64.0 / H)
     else:
@@ -82,21 +80,82 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1, argo=False):
     depth_map = depth_map[depth_map[:, 0] != -1.0]
     return depth_map
 
+def pto_ang_map_div(velo_points, H=64, W=512, slice=1, argo=False, div=1):
+    dtheta = np.radians(0.625 * 64.0 / H)
+    dphi = np.radians(90.0 / W)
+
+    x_low_bound = 0
+    x_high_bound = 0
+    x_div = 80.0 / div
+    depth_map_container = []
+
+    for i in range(div):
+        x_high_bound += x_div
+        print(i, x_low_bound, x_high_bound)
+        valid_inds = (velo_points[:, 0] < x_high_bound) & \
+                     (velo_points[:, 0] >= x_low_bound)
+        velo_points_i = velo_points[valid_inds]
+
+        x, y, z, i = velo_points_i[:, 0], velo_points_i[:, 1], velo_points_i[:, 2], velo_points_i[:, 3]
+
+        d = np.sqrt(x ** 2 + y ** 2 + z ** 2)
+        r = np.sqrt(x ** 2 + y ** 2)
+        d[d == 0] = 0.000001
+        r[r == 0] = 0.000001
+        phi = np.radians(45.) - np.arcsin(y / r)
+        phi_ = (phi / dphi).astype(int)
+        phi_[phi_ < 0] = 0
+        phi_[phi_ >= W] = W - 1
+
+        theta = np.radians(15.) - np.arcsin(z / r)
+        theta_ = (theta / dtheta).astype(int)
+        theta_[theta_ < 0] = 0
+        theta_[theta_ >= H] = H - 1
+
+        depth_map = -np.ones((H, W, 4))
+        depth_map[theta_, phi_, 0] = x
+        depth_map[theta_, phi_, 1] = y
+        depth_map[theta_, phi_, 2] = z
+        depth_map[theta_, phi_, 3] = i
+
+        depth_map = depth_map[0::slice, :, :]
+        depth_map = depth_map.reshape((-1, 4))
+        depth_map = depth_map[depth_map[:, 0] != -1.0]
+
+        depth_map_container.append(depth_map)
+
+        x_low_bound += x_div
+
+    result = depth_map_container[0]
+
+    if(len(depth_map_container) > 1):
+        for i in range(1, len(depth_map_container)):
+            result = np.vstack((result, depth_map_container[i]))
+
+    return result
 
 def gen_sparse_points(pl_data_path, args):
     pc_velo = np.fromfile(pl_data_path, dtype=np.float32).reshape((-1, 4))
 
+    if(args.div > 1):
+        valid_inds = (pc_velo[:, 1] < 50) & \
+                    (pc_velo[:, 1] >= -50) & \
+                    (pc_velo[:, 2] < 1.5) & \
+                    (pc_velo[:, 2] >= -2.5)
+        pc_velo = pc_velo[valid_inds]
+        return pto_ang_map_div(pc_velo, H=args.H, W=args.W, slice=args.slice, argo=args.argo, div=args.div)
+
+    else:
     # depth, width, height
-    valid_inds = (pc_velo[:, 0] < 120) & \
-                 (pc_velo[:, 0] >= 0) & \
-                 (pc_velo[:, 1] < 50) & \
-                 (pc_velo[:, 1] >= -50) & \
-                 (pc_velo[:, 2] < 1.5) & \
-                 (pc_velo[:, 2] >= -2.5)
-    pc_velo = pc_velo[valid_inds]
+        valid_inds = (pc_velo[:, 0] < 80) & \
+                    (pc_velo[:, 0] >= 0) & \
+                    (pc_velo[:, 1] < 50) & \
+                    (pc_velo[:, 1] >= -50) & \
+                    (pc_velo[:, 2] < 1.5) & \
+                    (pc_velo[:, 2] >= -2.5)
+        pc_velo = pc_velo[valid_inds]
 
-    return pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice, argo=args.argo)
-
+        return pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice, argo=args.argo)
 
 def gen_sparse_points_all(args):
     outputfolder = args.sparse_pl_path
@@ -118,6 +177,7 @@ if __name__ == '__main__':
     parser.add_argument('--W', default=512, type=int)
     parser.add_argument('--D', default=700, type=int)
     parser.add_argument('--argo', action='store_true')
+    parser.add_argument('--div', default=1, type=int)
     args = parser.parse_args()
 
     gen_sparse_points_all(args)
