@@ -22,7 +22,7 @@ os.environ["MKL_NUM_THREADS"] = "2"
 os.environ["VECLIB_MAXIMUM_THREADS"] = "2"
 os.environ["NUMEXPR_NUM_THREADS"] = "2"
 
-def filter_mask(pc_rect):
+=def filter_mask(pc_rect):
     """Return index of points that lies within the region defined below."""
     valid_inds = (pc_rect[:, 2] < 80) * \
                  (pc_rect[:, 2] > 1) * \
@@ -31,7 +31,6 @@ def filter_mask(pc_rect):
                  (pc_rect[:, 1] < 2.5) * \
                  (pc_rect[:, 1] >= -1)
     return valid_inds
-
 
 GRID_SIZE = 0.1
 index_field_sample = np.full(
@@ -51,9 +50,6 @@ def subsample_mask_by_grid(pc_rect):
     pc_rect_quantized[:, 1] = pc_rect_quantized[:, 1] + int(1 / GRID_SIZE)
 
     index_field = index_field_sample.copy()
-    print(index_field.shape)
-    print(np.arange(pc_rect.shape[0]))
-    print(pc_rect_quantized.shape)
 
     index_field[pc_rect_quantized[:, 1],
                 pc_rect_quantized[:, 2], pc_rect_quantized[:, 0]] = np.arange(pc_rect.shape[0])
