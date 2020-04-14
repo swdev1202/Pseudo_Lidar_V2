@@ -91,7 +91,6 @@ def pto_ang_map_div(velo_points, H=64, W=512, slice=1, argo=False, div=1):
 
     for i in range(div):
         x_high_bound += x_div
-        print(i, x_low_bound, x_high_bound)
         valid_inds = (velo_points[:, 0] < x_high_bound) & \
                      (velo_points[:, 0] >= x_low_bound)
         velo_points_i = velo_points[valid_inds]
