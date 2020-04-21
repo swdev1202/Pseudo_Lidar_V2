@@ -1,6 +1,6 @@
 import argparse
 import os
-
+import time
 import numpy as np
 
 
@@ -27,6 +27,7 @@ if __name__ == '__main__':
     pseudos = sorted(pseudos)
 
     for fn in velos:
+        start_time_iter = time.time()
         predix = fn[:-4]
 
         velo_file = '{}/{}.bin'.format(args.velo_dir, predix)
@@ -38,6 +39,9 @@ if __name__ == '__main__':
         combined_lidar = np.vstack((velo,psuedo))
         combined_lidar = np.concatenate([combined_lidar, np.ones((combined_lidar.shape[0], 1))], 1)
         combined_lidar = combined_lidar.astype(np.float32)
+        end_time_iter = time.time()
+
+        print(f'Inference takes {end_time_iter - start_time_iter} seconds')
 
         combined_lidar.tofile('{}/{}.bin'.format(args.save_dir, predix))
         print('Finish {}'.format(predix))
