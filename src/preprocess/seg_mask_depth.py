@@ -3,6 +3,7 @@ import sys
 import argparse
 from PIL import Image
 import numpy as np
+import time
 
 parser = argparse.ArgumentParser(description='apply masks on disparity map')
 parser.add_argument('--depth_folder', type=str, default='', help='path to the disparity map folder', required=True)
@@ -26,6 +27,7 @@ if not os.path.exists(args.save_dir):
 
 for depth_id, depth_name in enumerate(depths):
     # load disparity map (.npy)
+    start_time_iter = time.time()
     depth_path = os.path.join(depth_dir, depth_name)
     depth = np.load(depth_path)
     
@@ -38,6 +40,8 @@ for depth_id, depth_name in enumerate(depths):
     masked_disp = np.multiply(mask, depth) # apply masking
     save_path = args.save_dir + str(depth_id).zfill(6) + '.npy'
     np.save(save_path, masked_disp)
+    end_time_iter = time.time()
+    print(f'Inference takes {end_time_iter - start_time_iter} seconds')
 
     print('%04d/%04d: Masking done.' % (depth_id + 1, len(depths)))
 
