@@ -86,7 +86,7 @@ def pto_ang_map(velo_points, H=64, W=512, slice=1, div=1, line_spec=None, argo=F
 
     result = depth_map_container[0]
 
-     if(len(depth_map_container) > 1):
+    if(len(depth_map_container) > 1):
         for i in range(1, len(depth_map_container)):
             result = np.vstack((result, depth_map_container[i]))
 
