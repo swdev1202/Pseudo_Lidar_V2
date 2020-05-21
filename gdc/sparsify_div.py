@@ -127,7 +127,7 @@ def gen_sparse_points(data_idx, args):
         fill_in_line = None
 
     if args.store_line_map_dir is not None:
-        depth_map_lines, ptc = pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice,\
+        depth_map_lines, ptc = pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice, div=args.div,\
                     line_spec=args.line_spec, argo=args.argo, get_lines=True,\
                     fill_in_line=fill_in_line, fill_in_spec=args.fill_in_spec,
                     fill_in_slice=args.fill_in_slice)
@@ -135,7 +135,7 @@ def gen_sparse_points(data_idx, args):
                             "{:06d}".format(data_idx)), depth_map_lines)
         return ptc
     else:
-        return pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice, div=args.div\
+        return pto_ang_map(pc_velo, H=args.H, W=args.W, slice=args.slice, div=args.div,\
                             line_spec=args.line_spec, argo=args.argo, get_lines=False,
                             fill_in_line=fill_in_line, fill_in_spec=args.fill_in_spec,
                             fill_in_slice=args.fill_in_slice)
