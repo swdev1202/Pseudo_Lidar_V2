@@ -16,7 +16,7 @@ import numpy as np
 from tqdm.auto import tqdm
 
 from data_utils.kitti_util import Calibration
-from gdc import GDC
+from gdc_velo import GDC
 
 parser = argparse.ArgumentParser(description='GDC in batch')
 parser.add_argument('--input_path', type=str,
